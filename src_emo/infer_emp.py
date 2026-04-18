@@ -75,7 +75,7 @@ if __name__ == '__main__':
     config = vars(args)
 
     # Initialize the accelerator. We will let the accelerator handle device placement for us.
-    accelerator = Accelerator(device_placement=False, fp16=args.fp16)
+    accelerator = Accelerator(device_placement=False, mixed_precision='fp16' if args.fp16 else 'no')
     device = accelerator.device
 
     # Make one log on every process with the configuration for debugging.
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         context_max_length=args.context_max_length, resp_max_length=args.resp_max_length,infer = True,kg = kg, sample = args.sample, wk = args.wk, wt = args.wt, wn = args.wn
     )
     data_collator_generator = CRSEmpDataCollator(
-        tokenizer=tokenizer, device=device, gen=True, use_amp=accelerator.use_fp16, debug=args.debug,
+        tokenizer=tokenizer, device=device, gen=True, use_amp=(accelerator.mixed_precision == 'fp16'), debug=args.debug,
         ignore_pad_token_for_loss=args.ignore_pad_token_for_loss,
         context_max_length=args.context_max_length, resp_max_length=args.resp_max_length,
     )

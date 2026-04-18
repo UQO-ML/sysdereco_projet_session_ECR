@@ -12,7 +12,8 @@ from accelerate.utils import set_seed
 from loguru import logger
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
-from transformers import AdamW, get_linear_schedule_with_warmup, AutoTokenizer, AutoModel
+from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup, AutoTokenizer, AutoModel
 
 from dataset_dbpedia import DBpedia
 from dataset_pre import CRSDataset, CRSDataCollator
@@ -97,7 +98,7 @@ if __name__ == '__main__':
             torch.backends.cudnn.deterministic = True
 
     # Initialize the accelerator. We will let the accelerator handle device placement for us.
-    accelerator = Accelerator(device_placement=False, fp16=args.fp16)
+    accelerator = Accelerator(device_placement=False, mixed_precision='fp16' if args.fp16 else 'no')
     device = accelerator.device
 
     # Make one log on every process with the configuration for debugging.
@@ -202,7 +203,7 @@ if __name__ == '__main__':
     data_collator = CRSDataCollator(
         tokenizer=tokenizer, device=device, pad_entity_id=kg['pad_entity_id'],
         max_length=args.max_length, entity_max_length=args.entity_max_length,
-        use_amp=accelerator.use_fp16, debug=args.debug,
+        use_amp=(accelerator.mixed_precision == 'fp16'), debug=args.debug,
         prompt_tokenizer=text_tokenizer, prompt_max_length=args.prompt_max_length, pad_emotion_id = len(Emo_List), emotion_max_length=3,n_entity = kg["num_entities"]
     )
     train_dataloader = DataLoader(

@@ -13,7 +13,8 @@ from accelerate.utils import set_seed
 from loguru import logger
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
-from transformers import AdamW, get_linear_schedule_with_warmup, AutoTokenizer, AutoModel
+from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup, AutoTokenizer, AutoModel
 
 from config import gpt2_special_tokens_dict, prompt_special_tokens_dict, Emo_List
 from dataset_emp import CRSEmpDataCollator, CRSEmpDataset
@@ -77,7 +78,7 @@ if __name__ == '__main__':
     config = vars(args)
 
     # Initialize the accelerator. We will let the accelerator handle device placement for us.
-    accelerator = Accelerator(device_placement=False, fp16=args.fp16)
+    accelerator = Accelerator(device_placement=False, mixed_precision='fp16' if args.fp16 else 'no')
     device = accelerator.device
 
     # Make one log on every process with the configuration for debugging.
@@ -153,7 +154,7 @@ if __name__ == '__main__':
     )
     # dataloader
     data_collator_teacher = CRSEmpDataCollator(
-        tokenizer=tokenizer, device=device, use_amp=accelerator.use_fp16, debug=args.debug, gen=False,
+        tokenizer=tokenizer, device=device, use_amp=(accelerator.mixed_precision == 'fp16'), debug=args.debug, gen=False,
         ignore_pad_token_for_loss=args.ignore_pad_token_for_loss,
         context_max_length=args.context_max_length + args.resp_max_length
     )
@@ -171,7 +172,7 @@ if __name__ == '__main__':
         collate_fn=data_collator_teacher,
     )
     data_collator_generator = CRSEmpDataCollator(
-        tokenizer=tokenizer, device=device, gen=True, use_amp=accelerator.use_fp16, debug=args.debug,
+        tokenizer=tokenizer, device=device, gen=True, use_amp=(accelerator.mixed_precision == 'fp16'), debug=args.debug,
         ignore_pad_token_for_loss=args.ignore_pad_token_for_loss,
         context_max_length=args.context_max_length, resp_max_length=args.resp_max_length,
     )

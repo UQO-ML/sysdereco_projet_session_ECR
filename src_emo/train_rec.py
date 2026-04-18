@@ -16,7 +16,8 @@ from accelerate.utils import set_seed
 from loguru import logger
 from torch.utils.data import DataLoader, random_split
 from tqdm.auto import tqdm
-from transformers import AdamW, get_linear_schedule_with_warmup, AutoTokenizer, AutoModel
+from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup, AutoTokenizer, AutoModel
 
 from config import gpt2_special_tokens_dict, prompt_special_tokens_dict, Emo_List, seed_torch
 from dataset_dbpedia import DBpedia
@@ -95,7 +96,7 @@ if __name__ == '__main__':
     config = vars(args)
     seed_torch(args.seed)
     # Initialize the accelerator. We will let the accelerator handle device placement for us.
-    accelerator = Accelerator(device_placement=False, fp16=args.fp16)
+    accelerator = Accelerator(device_placement=False, mixed_precision='fp16' if args.fp16 else 'no')
     device = accelerator.device
 
     # Make one log on every process with the configuration for debugging.

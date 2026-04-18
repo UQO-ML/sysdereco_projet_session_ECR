@@ -3,7 +3,6 @@ import os
 
 import torch
 from loguru import logger
-from torch_geometric.typing import SparseTensor
 from collections import defaultdict
 from tqdm import tqdm
 
@@ -54,7 +53,6 @@ class DBpedia:
         edge = torch.as_tensor(edge_list, dtype=torch.long)
         self.edge_index = edge[:, :2].t().cuda()
         self.edge_type = edge[:, 2].cuda()
-        self.edge_index = SparseTensor(row=self.edge_index[0], col=self.edge_index[1], value=self.edge_type)
         self.num_relations = len(self.relation2id)
         self.pad_entity_id = max(self.entity2id.values()) + 1
         self.num_entities = max(self.entity2id.values()) + 2
