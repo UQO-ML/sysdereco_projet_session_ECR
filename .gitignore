@@ -236,3 +236,10 @@ cython_debug/
 
 # Local History for Visual Studio Code
 .history/
+
+# Cache
+.uv_cache/
+.hf_cache/
+
+# Data
+src_emo/data/*

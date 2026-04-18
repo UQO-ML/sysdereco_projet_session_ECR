@@ -1,1 +1,0 @@
-Please unzip the emo_data.zip file and move all files to this folder

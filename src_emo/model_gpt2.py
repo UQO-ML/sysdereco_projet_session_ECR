@@ -5,12 +5,13 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
 from torch.nn import functional as F
-from transformers import Conv1D
-from transformers.file_utils import ModelOutput
+from transformers.pytorch_utils import Conv1D, find_pruneable_heads_and_indices, prune_conv1d_layer
+from transformers.utils import ModelOutput, logging
 from transformers.modeling_outputs import BaseModelOutputWithPastAndCrossAttentions
-from transformers.modeling_utils import find_pruneable_heads_and_indices, prune_conv1d_layer
-from transformers.models.gpt2.modeling_gpt2 import GPT2MLP, GPT2PreTrainedModel, logger
+from transformers.models.gpt2.modeling_gpt2 import GPT2MLP, GPT2PreTrainedModel
 from transformers.utils.model_parallel_utils import assert_device_map, get_device_map
+
+logger = logging.get_logger(__name__)
 
 
 class GPT2Attention(nn.Module):
