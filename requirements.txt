@@ -1,0 +1,47 @@
+# Towards Empathetic Conversational Recommender System
+# Tested on Linux + RTX 5090 (sm_120) with Python 3.11 and CUDA 12.8.
+#
+# Install with:
+#   uv pip install -r requirements.txt
+# or:
+#   pip install -r requirements.txt
+#
+# The extra index URL is required so that pip resolves the CUDA 12.8
+# build of PyTorch (cu128 wheels) instead of the default CPU/cu12x build.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# --- Deep learning core (CUDA 12.8 build, required for RTX 5090) ---
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+
+# --- Hugging Face stack ---
+transformers==4.30.0
+accelerate==1.13.0
+huggingface_hub==0.36.2
+tokenizers
+safetensors
+
+# --- Graph neural networks (used by model_prompt.py / RGCNConv) ---
+torch-geometric==2.7.0
+
+# --- Scientific stack ---
+numpy==1.26.4
+scikit-learn==1.8.0
+scipy
+
+# --- NLP utilities (evaluate_conv.py, preprocessing) ---
+nltk==3.9.4
+
+# --- Misc runtime deps used across src_emo/ ---
+einops==0.8.2
+loguru==0.7.3
+tqdm==4.67.3
+wandb==0.26.0
+
+# --- Dataset / checkpoint download from Google Drive ---
+gdown
+
+# --- Notebook environment (run_project.ipynb) ---
+jupyter==1.1.1
+jupyterlab==4.5.6
+ipywidgets==8.1.8
