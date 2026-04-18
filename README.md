@@ -51,18 +51,6 @@ Manual procedure:
 2. Extract their contents directly inside the two folders listed above.
 3. After extraction, `src_emo/data/emo_data/` should contain `entity2id.json`, `train_data_dbpedia_emo.jsonl`, `valid_data_dbpedia_emo.jsonl`, `test_data_dbpedia_emo.jsonl`, `dbpedia_subkg.json`, `relation2id.json`, `relation_set.json`, `stop_words.txt`, `common_template.json`, `movie_reviews_filted_0.1_confi.json`, `conv_unicrs_{train,valid,test}.jsonl`, and the `llama_{train,test}.json` files.
 
-CLI alternative (requires `[gdown](https://github.com/wkentaro/gdown)`):
-
-```bash
-mkdir -p src_emo/data/emo_data src_emo/data/saved
-gdown "https://drive.google.com/uc?id=1fb9kDo8uSRLlwc5c4nUw8DZHR5XOY_l_" -O /tmp/ecr_data.zip
-unzip -o /tmp/ecr_data.zip -d src_emo/data/emo_data
-gdown "https://drive.google.com/uc?id=1uBtcqbQByVrrJ1hEwk2dvsAOxuvEgE19" -O /tmp/ecr_ckpt.zip
-unzip -o /tmp/ecr_ckpt.zip -d src_emo/data/saved
-```
-
-> The `src_emo/data/*` folder is git-ignored, so nothing is committed back to the repo.
-
 ## How to run
 
 ### 1. Create the virtual environment
@@ -84,11 +72,13 @@ All Python dependencies are pinned in `[requirements.txt](./requirements.txt)`. 
 
 ```bash
 uv pip install --upgrade pip
-uv pip install -r requirements.txt
+uv pip install --index-strategy unsafe-best-match -r requirements.txt
 python -c "import nltk; nltk.download('punkt')"
 ```
 
-(`pip install -r requirements.txt` works as well if you do not use `uv`.)
+The `--index-strategy unsafe-best-match` flag is required because `requirements.txt` declares both PyPI and the PyTorch CUDA 12.8 index. By default `uv` only resolves a given package from the *first* index that contains it (to prevent dependency-confusion attacks), which causes pinned packages such as `tqdm==4.67.3` to fail when an older version exists on the PyTorch index. `unsafe-best-match` tells `uv` that both indexes are equally trusted and to pick the best matching version across all of them.
+
+(`pip install -r requirements.txt` works as well if you do not use `uv`; plain `pip` does not have this restriction.)
 
 ### 3. Run the pipeline
 
@@ -100,10 +90,10 @@ jupyter lab run_project.ipynb
 
 It is organized in four sections that mirror the paper:
 
-1. **Preparation** &mdash; environment & dataset checks, Google Drive download helpers.
-2. **Subtask A &mdash; Emotional Semantic Fusion** (`src_emo/train_pre.py`).
-3. **Subtask B &mdash; Emotion-aware Item Recommendation** (`src_emo/train_rec.py`).
-4. **Subtask C &mdash; Emotion-aligned Response Generation** (`src_emo/train_emp.py` and `src_emo/infer_emp.py`).
+1. **Preparation** environment & dataset checks, Google Drive download helpers.
+2. **Subtask A Emotional Semantic Fusion** (`src_emo/train_pre.py`).
+3. **Subtask B Emotion-aware Item Recommendation** (`src_emo/train_rec.py`).
+4. **Subtask C Emotion-aligned Response Generation** (`src_emo/train_emp.py` and `src_emo/infer_emp.py`).
 
 Each training step has a **smoke-test** variant (5 steps, batch size 2) right before the full command so you can validate the setup quickly before launching a long run.
 
